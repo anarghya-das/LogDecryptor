@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
         restart=false;
         askPermission(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE, 1);
         if (!hiddenFolder.exists()){
-            exceptionRaised("Error","No logs created yet! Make sure Fog Signal app ran " +
-                    "at least once or the encrypted log folder in copied to your internal storage of " +
+            exceptionRaised("Error!","No logs created yet! Make sure Fog Signal app ran " +
+                    "at least once or the encrypted log folder is copied to your internal storage of " +
                     "the phone.",true);
         }else{
             if (fileIOPermission){
