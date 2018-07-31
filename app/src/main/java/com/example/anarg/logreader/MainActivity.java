@@ -313,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission Granted!",Toast.LENGTH_SHORT).show();
                     setContentView(R.layout.activity_main);
+                    fileIOPermission = true;
                     modifiedFiles = new HashMap<>();
                     status = findViewById(R.id.statusView);
                     allFolder = findViewById(R.id.spinner);
