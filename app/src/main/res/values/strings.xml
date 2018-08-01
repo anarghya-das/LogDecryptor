@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Log Decryptor</string>
+    <string name="heading">Welcome To Log Decryptor</string>
 </resources>

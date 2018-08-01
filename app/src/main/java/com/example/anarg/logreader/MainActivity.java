@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
     private boolean folderCreated;
     private String selectedFile;
     private boolean restart;
+    private AlertDialog dialog;
     private HashMap<File,Integer> modifiedFiles;
 
     @Override
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
             if (fileIOPermission){
                 setContentView(R.layout.activity_main);
                 modifiedFiles = new HashMap<>();
-                status = findViewById(R.id.statusView);
+                status = findViewById(R.id.Output);
                 allFolder = findViewById(R.id.spinner);
                 createFolderSpinner();
             }
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
         File[] allFiles=hiddenFolder.listFiles();
         ArrayList<String> folders=new ArrayList<>();
         for (File f: allFiles){
-            if (f.isDirectory()){
+            if (f.isDirectory()&&f.isHidden()){
                 String name=f.getName().substring(1,f.getName().length());
                 folders.add(name);
             }
@@ -117,39 +118,44 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
     }
 
     public void decryptButton(View view) {
-        status.setText("Process Started.....");
-        newFilesWritten=0;
-        folderCreated=false;
-        modifiedFiles.clear();
-        ThreadCompleteInterface t=this;
-        final Runnable readFiles= new Runnable() {
+        status.setVisibility(View.VISIBLE);
+        if (!fileIOPermission){
+            status.setText("Enable File Read/Write Permission");
+        }else {
+            status.setText("Process Started.....");
+            newFilesWritten = 0;
+            folderCreated = false;
+            modifiedFiles.clear();
+            ThreadCompleteInterface t = this;
+            final Runnable readFiles = new Runnable() {
                 String statusString = "";
-                String subFolderPath=folderPath+"/."+selectedFile;
+                String subFolderPath = folderPath + "/." + selectedFile;
                 boolean val;
+
                 @Override
                 public void run() {
                     try {
                         val = operation(subFolderPath);
-                        if (!modifiedFiles.isEmpty()){
-                            statusString+=modifiedMessage();
+                        if (!modifiedFiles.isEmpty()) {
+                            statusString += modifiedMessage();
                         }
                         if (val) {
                             if (folderCreated) {
                                 statusString += "Operation Completed!\n1 Folder Created!\n" + newFilesWritten + " File(s) were " +
                                         "created/changed!\nLocation: " + logFolderPath + "/" + selectedFile;
-                            }else{
+                            } else {
                                 statusString += "Operation Completed!\nNo New Folder Created!\n" + newFilesWritten + " File(s) were " +
                                         "created/changed!\nLocation: " + logFolderPath + "/" + selectedFile;
                             }
 //                        status.setText(statusString);
-                        }else{
-                            statusString+="All files Decrypted, Everything is updated in this folder!";
+                        } else {
+                            statusString += "All files Decrypted,\nEverything is updated in this folder!";
 //                        status.setText(statusString);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
 //                    status.setText("Error! :(");
-                    }finally {
+                    } finally {
                         t.notifyOfThreadComplete(statusString);
                     }
                 }
@@ -157,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
             new Thread(readFiles).start();
 //            Log.d("AppTest", Integer.toString(countLines(folderPath+"/.37855.log")));
 //            Log.d("AppTest", Integer.toString(countLines(logFolderPath+"/37855.log")))
+        }
     }
 
     @Override
@@ -291,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
             });
             builder.setPositiveButton("Exit", (dialog, which) -> finish());
         }
-        AlertDialog dialog = builder.create();
+        dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
         dialog.show();
@@ -311,15 +318,18 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission Granted!",Toast.LENGTH_SHORT).show();
-                    setContentView(R.layout.activity_main);
-                    fileIOPermission = true;
-                    modifiedFiles = new HashMap<>();
-                    status = findViewById(R.id.statusView);
-                    allFolder = findViewById(R.id.spinner);
-                    createFolderSpinner();
-                }else{
-                    Toast.makeText(this,"Enable it!",Toast.LENGTH_SHORT).show(); //change it later
+                    Toast.makeText(this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+                    if (dialog == null) {
+                        setContentView(R.layout.activity_main);
+                        fileIOPermission = true;
+                        modifiedFiles = new HashMap<>();
+                        status = findViewById(R.id.statusView);
+                        allFolder = findViewById(R.id.spinner);
+                        createFolderSpinner();
+                    }
+                }
+                else {
+                    Toast.makeText(this, "Enable it!", Toast.LENGTH_SHORT).show(); //change it later
                 }
         }
     }
