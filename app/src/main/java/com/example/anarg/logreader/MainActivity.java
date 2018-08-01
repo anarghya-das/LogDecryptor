@@ -3,6 +3,7 @@ package com.example.anarg.logreader;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
     private Spinner allFolder;
     private boolean folderCreated;
     private String selectedFile;
-    private boolean restart;
+    private boolean restart,val;
     private AlertDialog dialog;
     private HashMap<File,Integer> modifiedFiles;
 
@@ -130,8 +131,6 @@ public class MainActivity extends AppCompatActivity implements ThreadCompleteInt
             final Runnable readFiles = new Runnable() {
                 String statusString = "";
                 String subFolderPath = folderPath + "/." + selectedFile;
-                boolean val;
-
                 @Override
                 public void run() {
                     try {
